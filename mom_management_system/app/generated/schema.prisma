@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated"
+}
+
+model settings {
+  id           Int       @id @default(autoincrement())
+  settingKey   String    @unique(map: "settingKey") @db.VarChar(100)
+  settingValue String    @db.VarChar(255)
+  description  String?   @db.VarChar(255)
+  Created      DateTime? @default(now()) @db.DateTime(0)
+  Modified     DateTime? @default(now()) @db.DateTime(0)
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model meetingmember {
+  MeetingMemberID Int       @id @default(autoincrement())
+  MeetingID       Int
+  StaffID         Int
+  IsPresent       Boolean?  @default(false)
+  Remarks         String?   @db.VarChar(255)
+  Created         DateTime? @default(now()) @db.DateTime(0)
+  Modified        DateTime? @default(now()) @db.DateTime(0)
+
+  meeting meetings @relation(fields: [MeetingID], references: [MeetingID], map: "fk_meeting")
+  staff   staff    @relation(fields: [StaffID], references: [StaffID], map: "fk_staff")
+
+  @@index([MeetingID], map: "fk_meeting")
+  @@index([StaffID], map: "fk_staff")
+}
+
+model meetings {
+  MeetingID            Int       @id @default(autoincrement())
+  MeetingDate          DateTime  @db.DateTime(0)
+  MeetingTypeID        Int
+  MeetingDescription   String?   @db.VarChar(255)
+  DocumentPath         String?   @db.VarChar(255)
+  Created              DateTime? @default(now()) @db.DateTime(0)
+  Modified             DateTime? @default(now()) @db.DateTime(0)
+  IsCancelled          Boolean?  @default(false)
+  CancellationDateTime DateTime? @db.DateTime(0)
+  CancellationReason   String?   @db.VarChar(255)
+
+  meetingtype    meetingtype     @relation(fields: [MeetingTypeID], references: [MeetingTypeID], map: "fk_meeting_type")
+  meetingmembers meetingmember[]
+  tasks          tasks[]
+
+  @@index([MeetingTypeID], map: "fk_meeting_type")
+}
+
+model meetingtype {
+  MeetingTypeID   Int       @id @default(autoincrement())
+  MeetingTypeName String    @db.VarChar(100)
+  Remarks         String?   @db.VarChar(255)
+  Created         DateTime? @default(now()) @db.DateTime(0)
+  Modified        DateTime? @default(now()) @db.DateTime(0)
+
+  meetings meetings[]
+}
+
+model staff {
+  StaffID      Int       @id @default(autoincrement())
+  StaffName    String    @db.VarChar(100)
+  MobileNo     String?   @db.VarChar(15)
+  EmailAddress String?   @db.VarChar(100)
+  Remarks      String?   @db.VarChar(255)
+  Created      DateTime? @default(now()) @db.DateTime(0)
+  Modified     DateTime? @default(now()) @db.DateTime(0)
+  Department   String?   @db.VarChar(100)
+  Role         String?   @db.VarChar(100)
+  Status       String?   @default("Active") @db.VarChar(50)
+
+  meetingmembers meetingmember[]
+  tasks          tasks[]
+}
+
+model tasks {
+  TaskID          Int       @id @default(autoincrement())
+  TaskDescription String    @db.VarChar(500)
+  AssignedBy      String?   @db.VarChar(100)
+  Deadline        DateTime? @db.DateTime(0)
+  Status          String?   @default("Pending") @db.VarChar(50)
+  StaffID         Int
+  MeetingID       Int?
+  Created         DateTime? @default(now()) @db.DateTime(0)
+  Modified        DateTime? @default(now()) @db.DateTime(0)
+
+  meeting meetings? @relation(fields: [MeetingID], references: [MeetingID], map: "fk_task_meeting")
+  staff   staff     @relation(fields: [StaffID], references: [StaffID], map: "fk_task_staff")
+
+  @@index([MeetingID], map: "fk_task_meeting")
+  @@index([StaffID], map: "fk_task_staff")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model users {
+  user_id  Int     @id @default(autoincrement())
+  name     String? @db.VarChar(100)
+  email    String? @unique(map: "email") @db.VarChar(100)
+  password String? @db.VarChar(255)
+  role     String  @db.VarChar(30)
+}
