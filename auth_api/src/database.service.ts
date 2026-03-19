@@ -15,7 +15,6 @@
 //   }
 // }
 
-
 import { Injectable } from '@nestjs/common';
 import * as mysql from 'mysql2/promise';
 
@@ -25,12 +24,14 @@ export class DatabaseService {
   private pool;
 
   constructor() {
+    console.log("DB HOST:", process.env.DB_HOST);
+
     this.pool = mysql.createPool({
-      host: 'mysql-2f86ba98-riya-bf95.j.aivencloud.com',
-      port: 24652,
-      user: 'avnadmin',
-      password: 'AVNS_7G0v2qQQYGXJ_quqylk',
-      database: 'defaultdb',
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database:  process.env.DB_NAME,
 
       ssl: {
         rejectUnauthorized: false

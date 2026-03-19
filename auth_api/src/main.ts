@@ -13,6 +13,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-  await app.listen(3000);
+  await app.listen(process.env.DB_PORT || 3000);
 }
 bootstrap();
