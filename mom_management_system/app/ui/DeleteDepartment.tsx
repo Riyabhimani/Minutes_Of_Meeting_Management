@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { DeleteDepartmentAction } from "../actions/DeleteDepartmentAction";
+// import { DeleteDepartmentAction } from "../actions/DeleteDepartmentAction";
 
 export default function DeleteDepartment({ id }: { id: number }) {
   async function deleteDepartment() {
